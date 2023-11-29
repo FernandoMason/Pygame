@@ -1,0 +1,81 @@
+import pygame
+import sys
+
+pygame.init()
+pygame.font.init()
+
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Ghost")
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+RED = (255, 0, 0)
+BLUE = (0, 255, 255)
+
+player_width = 32
+player_height = 32
+player_x = 100
+player_y = 400
+player_speed = 5
+jump_height = 25
+
+gravity = 3
+on_ground = False
+jumping = False
+jump_velocity = 0
+
+coin_width = 32
+coin_height = 32
+coin_x = [200, 500, 700, 390, 500]
+coin_y = [300, 200, 100, 200, 500]
+coins_collected = 0
+
+platform_width = 200
+platform_height = 20
+platforms = [(100, 500), (300, 400), (500, 300), (600, 200)]
+
+enemy_width = 32
+enemy_height = 32
+enemy_x = [300, 600]
+enemy_y = [400, 250]
+enemy_speed = 3
+enemy_directions = [1, -1]
+current_enemy_direction = 0
+
+player_img = pygame.image.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\ghost.png')
+coin_img = pygame.image.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\coin.png')
+platform_img = pygame.image.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\wallHorizontal.png')
+enemy_img = pygame.image.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\enemy.png')
+menu_bg_img = pygame.image.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\menu.jpg')
+
+jump_sound = pygame.mixer.Sound(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\Jump.mp3')
+coin_sound = pygame.mixer.Sound(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\Moeda.mp3')
+menu_select_sound = pygame.mixer.Sound(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\Navega.mp3')
+
+clock = pygame.time.Clock()
+
+def display_text(text, font, color, x, y, background_color=None):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=(x, y))
+
+    if background_color:
+        pygame.draw.rect(screen, background_color, (text_rect.x - 10, text_rect.y - 5, text_rect.width + 20, text_rect.height + 10))
+    
+    screen.blit(text_surface, text_rect)
+
+def display_menu(selected_option):
+    screen.blit(menu_bg_img, (0, 0))
+
+    font = pygame.font.Font(None, 48)
+    display_text("Ghost Game", font, WHITE, screen_width // 2, screen_height // 4)
+
+    font = pygame.font.Font(None, 36)
+    options = ["Jogar", "Seleção de Fases", "Créditos", "Sair"]
+    for i, option in enumerate(options):
+        if i == selected_option:
+            display_text(f"> {option} <", font, WHITE, screen_width // 2, screen_height // 2 + i * 50)
+        else:
+            display_text(option, font, WHITE, screen_width // 2,
