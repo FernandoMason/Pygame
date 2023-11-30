@@ -1,0 +1,112 @@
+for i in range(len(coin_x)):
+            if (
+                player_x < coin_x[i] + coin_width
+                and player_x + player_width > coin_x[i]
+                and player_y < coin_y[i] + coin_height
+                and player_y + player_height > coin_y[i]
+            ):
+                coins_collected += 1
+                coin_x[i] = -100
+                coin_sound.play()
+
+        for i in range(len(enemy_x)):
+            if i == 0:
+                if enemy_x[i] <= 285:
+                    enemy_directions[current_enemy_direction] = 1
+                elif enemy_x[i] >= 485:
+                    enemy_directions[current_enemy_direction] = -1
+
+            enemy_x[i] += enemy_speed * enemy_directions[current_enemy_direction]
+
+            for platform in platforms:
+                if (
+                    enemy_x[i] < platform[0] + platform_width
+                    and enemy_x[i] + enemy_width > platform[0]
+                    and enemy_y[i] + enemy_height > platform[1]
+                    and enemy_y[i] < platform[1] + platform_height + enemy_height
+                ):
+                    enemy_y[i] = platform[1] - enemy_height
+                    break
+            else:
+                if (
+                    enemy_x[i] <= 0 and current_enemy_direction == 1
+                    or enemy_x[i] >= screen_width - enemy_width and current_enemy_direction == 0
+                ):
+                    current_enemy_direction = 1 - current_enemy_direction
+
+        for i in range(len(enemy_x)):
+            if (
+                player_x < enemy_x[i] + enemy_width
+                and player_x + player_width > enemy_x[i]
+                and player_y < enemy_y[i] + enemy_height
+                and player_y + player_height > enemy_y[i]
+            ):
+                print("Game Over")
+                return False
+
+        display_game()
+        pygame.display.update()
+        clock.tick(60)
+
+        if coins_collected == len(coin_x):
+            display_text("Você venceu!", pygame.font.Font(None, 48), BLACK, screen_width // 2, screen_height // 2, YELLOW)
+            pygame.display.update()
+            pygame.time.delay(2000)
+            return True
+        
+def run_menu():
+    selected_option = 0
+    option_changed = False
+    pygame.mixer.music.load(r'C:\Users\joaop\OneDrive\Área de Trabalho\Faculdade\Ghost - Parte III\assets\Navega.mp3')
+
+    while True:
+        handle_menu_events()
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP]:
+            if not option_changed:
+                selected_option = (selected_option - 1) % 4
+                option_changed = True
+                pygame.mixer.music.play()
+        elif keys[pygame.K_DOWN]:
+            if not option_changed:
+                selected_option = (selected_option + 1) % 4
+                option_changed = True
+                pygame.mixer.music.play()
+
+        if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+            option_changed = False
+
+        if keys[pygame.K_RETURN]:
+            return selected_option
+
+        display_menu(selected_option)
+        pygame.display.update()
+        clock.tick(60)
+
+        
+def run_credits():
+    start_time = pygame.time.get_ticks()
+
+    while pygame.time.get_ticks() - start_time < 5000:
+        handle_credits_events()
+        display_credits()
+        pygame.display.update()
+        clock.tick(60)
+
+while True:
+    selected_option = run_menu()
+
+    if selected_option == 0:
+        if run_game():
+            print("Você venceu!")
+        else:
+            print("Você perdeu!")
+    elif selected_option == 1:
+        print("Seleção de Fases")
+    elif selected_option == 2:
+        run_credits()
+    elif selected_option == 3:
+        pygame.quit()
+        sys.exit()
