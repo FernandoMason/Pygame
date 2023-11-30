@@ -70,7 +70,6 @@ def run_game():
                 jump_velocity = 0
                 break
         else:
-    
             on_ground = False
             jumping = True
 
